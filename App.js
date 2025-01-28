@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList } from 'react-native';
 
 export default function Calculator() {
   const [firstNumber, setFirstNumber] = useState('');
   const [secondNumber, setSecondNumber] = useState('');
   const [result, setResult] = useState(null);
+  const [history, setHistory] = useState([]);
 
   const handleAddition = () => {
     if (isValidInput()) {
-      setResult(parseFloat(firstNumber) + parseFloat(secondNumber));
+      const sum = parseFloat(firstNumber) + parseFloat(secondNumber);
+      setResult(sum);
+      addToHistory(`${firstNumber} + ${secondNumber} = ${sum}`);
     } else {
       showAlert();
     }
@@ -16,7 +19,9 @@ export default function Calculator() {
 
   const handleSubtraction = () => {
     if (isValidInput()) {
-      setResult(parseFloat(firstNumber) - parseFloat(secondNumber));
+      const difference = parseFloat(firstNumber) - parseFloat(secondNumber);
+      setResult(difference);
+      addToHistory(`${firstNumber} - ${secondNumber} = ${difference}`);
     } else {
       showAlert();
     }
@@ -33,6 +38,10 @@ export default function Calculator() {
 
   const showAlert = () => {
     Alert.alert('Virhe', 'Anna kelvolliset numerot molempiin kenttiin.');
+  };
+
+  const addToHistory = (calculation) => {
+    setHistory((prevHistory) => [calculation, ...prevHistory]);
   };
 
   return (
@@ -63,6 +72,13 @@ export default function Calculator() {
       {result !== null && (
         <Text style={styles.result}>Tulos: {result}</Text>
       )}
+
+      <Text style={styles.historyTitle}>Historia</Text>
+      <FlatList
+        data={history}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => <Text style={styles.historyItem}>{item}</Text>}
+      />
     </View>
   );
 }
@@ -100,5 +116,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
+  },
+  historyTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  historyItem: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 5,
   },
 });
